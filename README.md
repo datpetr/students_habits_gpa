@@ -1,831 +1,463 @@
-\documentclass[12pt,a4paper]{article}
+# STAT250 FINAL PROJECT
 
-% Required packages
-\usepackage{float}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage{amsmath,amsfonts,amssymb}
-\usepackage{graphicx}
-\usepackage{hyperref}
-\usepackage{geometry}
-\usepackage{fancyhdr}
-\usepackage{titlesec}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{xcolor}
-\usepackage{enumitem}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{tcolorbox}
-\usepackage{pgfplots}
-\usepackage{tikz}
-\usepackage{multirow}
-\pgfplotsset{compat=1.18}
+## "Impact of Lifestyle Factors and Time Allocation on Students' GPA and Stress Levels"
 
-% Page setup
-\geometry{margin=1in}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[C]{STAT250 Final Project}
-\fancyfoot[C]{\thepage}
+**Made by:**
+- Elizaveta Polyakova
+- Petr Datsenko
+- Samuil Datsenko
 
-% Custom colors
-\definecolor{titleblue}{RGB}{0,102,204}
-\definecolor{sectiongray}{RGB}{240,240,240}
-% Define custom colors for the bars
-\definecolor{lowstress}{RGB}{102, 194, 165}     % Teal green
-\definecolor{modstress}{RGB}{252, 141, 98}      % Orange
-\definecolor{highstress}{RGB}{231, 138, 195}    % Pink
+---
 
-% Define colors for box plot (matching your original chart)
-\definecolor{lowstressbox}{RGB}{134, 175, 156}
-\definecolor{modstressbox}{RGB}{204, 142, 103}
-\definecolor{highstressbox}{RGB}{132, 147, 168}
+## Table of Contents
 
-% Additional colors for regression analysis
-\definecolor{darkblue}{RGB}{0,51,102}
-\definecolor{lightblue}{RGB}{173,216,230}
-\definecolor{darkgreen}{RGB}{0,100,0}
+1. [Abstract](#abstract)
+2. [Introduction](#introduction)
+3. [Exploratory Data Analysis (EDA)](#exploratory-data-analysis-eda)
+4. [Statistical Methods and Inference](#statistical-methods-and-inference)
+5. [Results and Conclusions](#results-and-conclusions)
+6. [References](#references)
 
-% Title formatting
-\titleformat{\section}{\large\bfseries\color{titleblue}}{\thesection}{1em}{}
-\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+---
 
-% Custom boxes
-\newtcolorbox{importantbox}{
-    colback=yellow!10,
-    colframe=orange!75!black,
-    boxrule=0.5pt,
-    rounded corners,
-    left=5pt,
-    right=5pt,
-    top=5pt,
-    bottom=5pt
-}
+## Abstract
 
-\newtcolorbox{methodbox}{
-    colback=blue!5,
-    colframe=blue!50!black,
-    boxrule=0.5pt,
-    rounded corners,
-    left=5pt,
-    right=5pt,
-    top=5pt,
-    bottom=5pt
-}
-
-\newtcolorbox{conclusionbox}{
-    colback=darkgreen!10,
-    colframe=darkgreen,
-    boxrule=0.5pt,
-    rounded corners,
-    left=5pt,
-    right=5pt,
-    top=5pt,
-    bottom=5pt
-}
-
-% Document settings
-\setlength{\parskip}{6pt}
-\setlength{\parindent}{0pt}
-
-\begin{document}
-
-% Title Page
-\begin{titlepage}
-    \centering
-    \vspace*{2cm}
-    
-    {\Huge\bfseries\color{titleblue} STAT250 FINAL PROJECT}
-    
-    \vspace{2cm}
-    
-    {\LARGE\bfseries "Impact of Lifestyle Factors and Time Allocation on Students' GPA and Stress Levels"\\}
-
-      
-    \vspace{10cm}
-    
-    {\Large 
-    \textbf{Made by:}\\[0.5cm]
-    Elizaveta Polyakova\\
-    Petr Datsenko\\
-    Samuil Datsenko\\
-    }
-
-    
-    
-\end{titlepage}
-
-% Table of Contents
-\tableofcontents
-\newpage
-
-% Abstract Section - Insert this before the EDA section
-\section{Abstract}
-
-This project examines how university students' lifestyle habits, including study time, sleep duration, and participation in extracurricular activities, influence their stress levels and academic performance (GPA). Using R and Python, we analyzed survey data from 2,000 students, beginning with an exploration of distributions through visualizations and descriptive statistics. 
+This project examines how university students' lifestyle habits, including study time, sleep duration, and participation in extracurricular activities, influence their stress levels and academic performance (GPA). Using R and Python, we analyzed survey data from 2,000 students, beginning with an exploration of distributions through visualizations and descriptive statistics.
 
 We then conducted hypothesis tests to assess whether students meet recommended sleep thresholds (z-test), whether GPA varies significantly by stress level (ANOVA), regression analysis to quantify the relationship between study hours and GPA, and a comparison of social interaction time between high and low study groups (Welch's t-test). The findings offer important insights into the relationship between student well-being and academic outcomes, supported by clear R and Python generated graphs and statistical evidence.
 
-% Introduction Section - Insert this after the Abstract section
-\section{Introduction}
+## Introduction
 
-University students often face challenges in balancing academic responsibilities, personal health, and social engagement, with stress playing a critical role in both their well-being and academic performance. This project investigates how daily habits such as study time, sleep duration, and involvement in extracurricular activities relate to students' stress levels and GPA. 
+University students often face challenges in balancing academic responsibilities, personal health, and social engagement, with stress playing a critical role in both their well-being and academic performance. This project investigates how daily habits such as study time, sleep duration, and involvement in extracurricular activities relate to students' stress levels and GPA.
 
 By analyzing survey data from 2,000 students, we aim to better understand these relationships and offer insights that may help students structure their routines to support both academic success and overall well-being.
 
-\vspace{0.5cm}
+## Exploratory Data Analysis (EDA)
 
-% Main Content
-\section{Exploratory Data Analysis (EDA)}
+> **Dataset Overview:** Our dataset contains results of a 2024 Google Form survey of 2000 university students, primarily from India. The survey's aim was to collect information about the students' lifestyle, academic performance and stress levels. Our goal is to arrive to conclusions about effects of different factors in students' lives on their grades and well being.
 
-\begin{importantbox}
-\textbf{Dataset Overview:} Our dataset contains results of a 2024 Google Form survey of 2000 university students, primarily from India. The survey's aim was to collect information about the students' lifestyle, academic performance and stress levels. Our goal is to arrive to conclusions about effects of different factors in students' lives on their grades and well being.
-\end{importantbox}
-
-\subsection{Variable Description}
+### Variable Description
 
 We have eight variables in our dataset:
 
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Student ID:} Discrete (nominal) variable
-    \item \textbf{Stress Level:} Ordinal variable  
-    \item \textbf{Six continuous (interval) variables:}
-    \begin{itemize}
-        \item Study hours per day
-        \item Extracurricular activity hours per day
-        \item Sleep hours per day
-        \item Social interaction hours per day
-        \item Physical activity hours per day
-        \item GPA
-    \end{itemize}
-\end{itemize}
+- **Student ID:** Discrete (nominal) variable
+- **Stress Level:** Ordinal variable
+- **Six continuous (interval) variables:**
+  - Study hours per day
+  - Extracurricular activity hours per day
+  - Sleep hours per day
+  - Social interaction hours per day
+  - Physical activity hours per day
+  - GPA
 
 Below we will analyze the discrete and continuous variables separately for better understanding.
 
-\subsection{Discrete Variables}
+### Discrete Variables
 
-First we will look at the \textbf{"Student ID"} and \textbf{"Stress Level"} variables which are discrete.
+First we will look at the **"Student ID"** and **"Stress Level"** variables which are discrete.
 
 Student ID is a simple sequence of numbers from 1 to 2000 to show that each observation is unique and belongs to a certain student. Since it's a discrete (nominal) variable there's no point in creating a graph for it or finding any correlation with the ID and other factors which is why we will not be using it in our research.
 
-Stress level is an ordinal variable with 3 possible levels of stress that students could identify with: \textbf{Low}, \textbf{Moderate} and \textbf{High}. As we can deduce from the data analysis, \underline {more than half of students claim to have "High" stress levels}.
+Stress level is an ordinal variable with 3 possible levels of stress that students could identify with: **Low**, **Moderate** and **High**. As we can deduce from the data analysis, **more than half of students claim to have "High" stress levels**.
 
-\begin{figure}[H] 
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    ybar,
-    width=12cm,
-    height=8cm,
-    title={\textbf{Percentage of Students by Stress Level}},
-    title style={yshift=0.3cm, font=\normalsize\bfseries},
-    xlabel=\textbf{Stress Level},
-    ylabel=\textbf{Percentage of Students (\%)},
-    xmin=-0.5,
-    xmax=2.5,
-    ymin=0,
-    ymax=60,
-    xtick={-0.65 ,1,2.65},  % Positions of the bars
-    xticklabels={Low, Moderate, High},  % Labels centered on bars
-    xticklabel style={font=\small, yshift=-2pt},
-    ytick={0,10,20,30,40,50},
-    yticklabel style={font=\small},
-    grid=major,
-    grid style={color=gray!20, line width=0.2pt},
-    axis background/.style={fill=white},
-    axis line style={line width=0.5pt, color=black},
-    tick style={line width=0.5pt, color=black},
-    bar width=0.6,
-    enlarge x limits=0.25,
-    nodes near coords,
-    nodes near coords style={
-        color=black,
-        font=\small,
-        anchor=south,
-        yshift=2pt
-    },
-    nodes near coords={\pgfmathprintnumber{\pgfplotspointmeta}\%},
-]
+**Figure 1: Distribution of stress levels among university students (N=2000)**
 
-% Colorful bars with proper positioning
-\addplot[
-    fill=green!60!black,  % Dark green for low stress
-    draw=black,
-    line width=0.3pt
-] coordinates {(0, 14.8)};
+| Stress Level | Percentage |
+|--------------|------------|
+| Low          | 14.8%      |
+| Moderate     | 33.7%      |
+| High         | 51.4%      |
 
-\addplot[
-    fill=yellow!70!orange,  % Gold/yellow for moderate stress
-    draw=black,
-    line width=0.3pt
-] coordinates {(1, 33.7)};
+*The majority of students (51.4%) report high stress levels, while only 14.8% report low stress levels.*
 
-\addplot[
-    fill=red!80!black,  % Dark red for high stress
-    draw=black,
-    line width=0.3pt
-] coordinates {(2, 51.4)};
-
-\end{axis}
-\end{tikzpicture}
-\caption{Distribution of stress levels among university students (N=2000). The majority of students (51.4\%) report high stress levels, while only 14.8\% report low stress levels.}
-\label{fig:stress_distribution}
-\end{figure}
-
-\subsection{Continuous Variables}
+### Continuous Variables
 
 Secondly, we will be analyzing the continuous variables with descriptive statistics.
 
-\begin{table}[h!]
-\centering
-\caption{Descriptive Statistics for Continuous Variables}
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Variable} & \textbf{Median} & \textbf{Mean} & \textbf{Standard Dev.} & \textbf{Minimum} & \textbf{Maximum} \\
-\hline
-Study Duration & 7.40 & 7.48 & 1.4 & 5.0 & 10.0 \\
-\hline
-Physical Activity & 2.00 & 4.33 & 2.5 & 0.0 & 13.0 \\
-\hline
-Sleep Duration & 7.50 & 7.50 & 1.5 & 5.0 & 10.0 \\
-\hline
-Social Interaction & 2.60 & 2.70 & 1.7 & 0.0 & 6.0 \\
-\hline
-Extracurricular Time & 4.33 & 1.99 & 1.2 & 0.0 & 4.0 \\
-\hline
-GPA & 3.00 & 3.12 & 0.3 & 2.2 & 4.0 \\
-\hline
-\end{tabular}
-\label{tab:descriptive_stats}
-\end{table}
+**Table 1: Descriptive Statistics for Continuous Variables**
 
-\subsubsection{Distribution Analysis}
+| Variable | Median | Mean | Standard Dev. | Minimum | Maximum |
+|----------|--------|------|---------------|---------|---------|
+| Study Duration | 7.40 | 7.48 | 1.4 | 5.0 | 10.0 |
+| Physical Activity | 2.00 | 4.33 | 2.5 | 0.0 | 13.0 |
+| Sleep Duration | 7.50 | 7.50 | 1.5 | 5.0 | 10.0 |
+| Social Interaction | 2.60 | 2.70 | 1.7 | 0.0 | 6.0 |
+| Extracurricular Time | 4.33 | 1.99 | 1.2 | 0.0 | 4.0 |
+| GPA | 3.00 | 3.12 | 0.3 | 2.2 | 4.0 |
 
-\begin{importantbox}
-The table below presents the explanatory variables for our interval factors. The \textbf{mean ($\bar{x}$)} provides the average value for each factor, while the \textbf{standard deviation ($s$)} indicates the amount of dispersion within the data. Additionally, the maximum and minimum values reveal the highest and lowest observations for each variable.
-\end{importantbox}
+#### Distribution Analysis
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.9\textwidth]{images/histogram_distributions.png}
-\caption{Distributions of Student Habits (in Hours Per Day) and GPA}
-\label{fig:histograms}
-\end{figure}
+> The table below presents the explanatory variables for our interval factors. The **mean (x̄)** provides the average value for each factor, while the **standard deviation (s)** indicates the amount of dispersion within the data. Additionally, the maximum and minimum values reveal the highest and lowest observations for each variable.
 
-\textbf{Key Observations from Distribution Analysis:}
+**Key Observations from Distribution Analysis:**
 
-\begin{itemize}[leftmargin=*]
-    \item The \textbf{"GPA"} is somewhat \textcolor{blue}{\textbf{normally distributed}}
-    \item The \textbf{"Physical Activity"} hours per day is \textcolor{red}{\textbf{right-skewed}}
-    \item \textbf{"Social"} hours per day is only very slightly \textcolor{red}{\textbf{right-skewed}}
-    \item Other variables don't seem to have a particular lean and are somewhat random, having sudden peaks and lows
-    \item \textbf{Important:} Neither of the factors has any extreme outliers
-\end{itemize}
+- The **"GPA"** is somewhat **normally distributed**
+- The **"Physical Activity"** hours per day is **right-skewed**
+- **"Social"** hours per day is only very slightly **right-skewed**
+- Other variables don't seem to have a particular lean and are somewhat random, having sudden peaks and lows
+- **Important:** Neither of the factors has any extreme outliers
 
-\section{Statistical Methods and Inference}
+## Statistical Methods and Inference
 
-\subsection{Research Question 1: Sleep Duration Analysis}
+### Research Question 1: Sleep Duration Analysis
 
-\textbf{Question:} Do students on average get at least 7 hours of sleep, which is the recommended minimum amount for adults?
+**Question:** Do students on average get at least 7 hours of sleep, which is the recommended minimum amount for adults?
 
-\textbf{Approach:} We have a null hypothesis of the population mean being equal to 7 hours or more which will be tested using the z-test.
+**Approach:** We have a null hypothesis of the population mean being equal to 7 hours or more which will be tested using the z-test.
 
-\subsubsection{Assumptions for Z-Test}
+#### Assumptions for Z-Test
 
 Since we will be using z-test we have certain assumptions and conditions which need to be met:
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Large Sample Size (Central Limit Theorem):} Since we have a large sample of 2000 observations we can argue that the sample mean will be approximately normally distributed even though the population is not. Thus, we apply the CLT.
-    
-    \item \textbf{Unknown Population Variance:} Since we don't know the population variance we will be using the $s$ instead of $\sigma$. Due to the large sample size, the sample variance is a reliable estimator of the population variance.
-    
-    \item \textbf{Independence of Observations:} We assume each data point to be independent. We can't check this, but since we got the dataset from a reliable website we need to trust that the sampling technique used was not biased.
-    
-    \item \textbf{Extreme Outliers:} As we have seen during the data analyzation process, our data does not have any extreme outliers and thus we don't need to worry about it sabotaging our measures.
-\end{enumerate}
+1. **Large Sample Size (Central Limit Theorem):** Since we have a large sample of 2000 observations we can argue that the sample mean will be approximately normally distributed even though the population is not. Thus, we apply the CLT.
 
-\subsubsection{Test Statistics and Calculations}
+2. **Unknown Population Variance:** Since we don't know the population variance we will be using the s instead of σ. Due to the large sample size, the sample variance is a reliable estimator of the population variance.
 
-\textbf{Basic Statistics and What We're Testing}
+3. **Independence of Observations:** We assume each data point to be independent. We can't check this, but since we got the dataset from a reliable website we need to trust that the sampling technique used was not biased.
 
-\textbf{What we know:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Sample Size:} 2,000 students
-    \item \textbf{Sample Mean:} $\bar{x} = 7.5$ hours of sleep (average from our sample) 
-    \item \textbf{Standard Deviation:} $s = 1.5$ hours (how much individual sleep times vary)
-    \item \textbf{Standard Error:} $SE = \frac{s}{\sqrt{n}} = \frac{1.5}{\sqrt{2000}} = 0.0335$ (precision of our estimate)
-    \item \textbf{Significance Level:} $\alpha = 0.05$ (5\% chance we're wrong when rejecting null hypothesis)
-\end{itemize}
+4. **Extreme Outliers:** As we have seen during the data analyzation process, our data does not have any extreme outliers and thus we don't need to worry about it sabotaging our measures.
 
-\textbf{Hypotheses:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Null Hypothesis ($H_0$):} Students sleep 7 hours or less per day ($\mu \leq 7$)
-    \item \textbf{Alternative Hypothesis ($H_1$):} Students sleep more than 7 hours per day ($\mu > 7$)
-\end{itemize}
+#### Test Statistics and Calculations
 
-{Calculating the Test Statistic and p-value}
+**Basic Statistics and What We're Testing**
 
-\begin{methodbox}
-\textbf{Z-statistic calculation:}
+**What we know:**
+- **Sample Size:** 2,000 students
+- **Sample Mean:** x̄ = 7.5 hours of sleep (average from our sample)
+- **Standard Deviation:** s = 1.5 hours (how much individual sleep times vary)
+- **Standard Error:** SE = s/√n = 1.5/√2000 = 0.0335 (precision of our estimate)
+- **Significance Level:** α = 0.05 (5% chance we're wrong when rejecting null hypothesis)
 
-The Z-statistic measures how far away the sample mean is from the hypothesized population mean:
+**Hypotheses:**
+- **Null Hypothesis (H₀):** Students sleep 7 hours or less per day (μ ≤ 7)
+- **Alternative Hypothesis (H₁):** Students sleep more than 7 hours per day (μ > 7)
 
-$$Z = \frac{\bar{x} - \mu_0}{SE} = \frac{7.5 - 7}{0.0335} = \frac{0.5}{0.0335} = 14.93$$
+**Calculating the Test Statistic and p-value**
 
-\textbf{p-value calculation:}
+> **Z-statistic calculation:**
+> 
+> The Z-statistic measures how far away the sample mean is from the hypothesized population mean:
+> 
+> Z = (x̄ - μ₀)/SE = (7.5 - 7)/0.0335 = 0.5/0.0335 = 14.93
+> 
+> **p-value calculation:**
+> 
+> The p-value gives us the probability of getting an observation as or more extreme than the one obtained:
+> 
+> p-value = P(Z > 14.93) = 1.95 × 10⁻⁵³
+> 
+> **What this means:** Since p-value is extremely small (almost zero), we can be almost certain that the population has mean of more than 7 and we reject the null hypothesis.
+> 
+> **99% confidence interval calculation:**
+> 
+> The CI formula: x̄ ± z_{α/2} × SE
+> 
+> **Steps to calculate CI:**
+> 1. The z_{α/2} for 99% confidence is: z_{0.005} = 2.576
+> 2. The margin of error: 2.576 × 0.0335 = 0.0863
+> 3. The interval: 7.5 ± 0.0863
+> 
+> **99% Confidence Interval: [7.41, 7.59]**
+> 
+> **What this means:** We're 99% confident that the true average sleep time for all students (our population) is between 7.41 and 7.59 hours.
 
-The p-value gives us the probability of getting an observation as or more extreme than the one obtained:
-
-$$\text{p-value} = P(Z > 14.93) = 1.95 \times 10^{-53}$$
-
-\textbf{What this means:} Since p-value is extremely small (almost zero), we can be almost certain that the population has mean of more than 7 and we reject the null hypothesis.\\
-\\
-\textbf{99\% confidence interval calculation:}
-
-The CI formula: $\bar{x} \pm z_{\alpha/2} \times SE$ \\
-
-\textbf{Steps to calculate CI:}
-\begin{enumerate}[leftmargin=*]
-    \item The $z_{\alpha/2}$ for 99\% confidence is: $z_{0.005} = 2.576$
-    \item The margin of error: $2.576 \times 0.0335 = 0.0863$
-    \item The interval: $7.5 \pm 0.0863$
-\end{enumerate}
-
-\textcolor{blue}{\textbf{99\% Confidence Interval: [7.41, 7.59]}}
-
-\textbf{What this means:} We're 99\% confident that the true average sleep time for all students (our population) is between 7.41 and 7.59 hours.
-\end{methodbox}
-
-\textbf{Conclusion for Sleep Analysis}
+**Conclusion for Sleep Analysis**
 
 According to the z-test, p-value and the CI, we can confidently claim that the population average is higher than 7. Thus, we believe that the students, on average, get around 7 hours and 30 minutes of sleep which is not too high but at least it is more than bare healthy minimum for adults.
 
-\subsection{Research Question 2: GPA and Stress Level Analysis}
+### Research Question 2: GPA and Stress Level Analysis
 
-\textbf{Question:} Is there a significant difference in GPA among students with different stress levels?
+**Question:** Is there a significant difference in GPA among students with different stress levels?
 
-\textbf{Approach:} We will use One-Way ANOVA (Analysis of Variance) to test if there are significant differences in mean GPA across the three stress level groups (Low, Moderate, High).
+**Approach:** We will use One-Way ANOVA (Analysis of Variance) to test if there are significant differences in mean GPA across the three stress level groups (Low, Moderate, High).
 
-\subsubsection{Assumptions for One-Way ANOVA}
+#### Assumptions for One-Way ANOVA
 
 Before conducting ANOVA, we must verify that our data satisfies the following assumptions:
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Independence of Observations:} Each student's GPA should be independent of others. We assume this is satisfied based on the survey design where individual responses were collected independently.
-    
-    \item \textbf{Normality:} The GPA values within each stress level group should be approximately normally distributed. We will test this using the Shapiro-Wilk test for each group.
-    
-    \item \textbf{Homogeneity of Variances (Homoscedasticity):} The variance of GPA should be approximately equal across all three stress level groups. We will test this using Levene's test.
-\end{enumerate}
+1. **Independence of Observations:** Each student's GPA should be independent of others. We assume this is satisfied based on the survey design where individual responses were collected independently.
 
-\subsubsection{Descriptive Statistics by Stress Level}
+2. **Normality:** The GPA values within each stress level group should be approximately normally distributed. We will test this using the Shapiro-Wilk test for each group.
+
+3. **Homogeneity of Variances (Homoscedasticity):** The variance of GPA should be approximately equal across all three stress level groups. We will test this using Levene's test.
+
+#### Descriptive Statistics by Stress Level
 
 Before conducting the formal test, let's examine the descriptive statistics for GPA across stress levels:
 
-\begin{table}[H]
-\centering
-\caption{Descriptive Statistics for GPA by Stress Level}
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Stress Level} & \textbf{N} & \textbf{Mean} & \textbf{Std. Dev.} & \textbf{Min} & \textbf{Max} \\
-\hline
-Low & 296 & 2.78 & 0.28 & 2.25 & 3.60 \\
-\hline
-Moderate & 674 & 2.99 & 0.27 & 2.45 & 3.75 \\
-\hline
-High & 1028 & 3.23 & 0.29 & 2.30 & 4.00 \\
-\hline
-\textbf{Overall} & \textbf{1998} & \textbf{3.12} & \textbf{0.30} & \textbf{2.25} & \textbf{4.00} \\
-\hline
-\end{tabular}
-\label{tab:gpa_descriptive}
-\end{table}
+**Table 2: Descriptive Statistics for GPA by Stress Level**
 
-\subsubsection{Visualization of GPA Distribution by Stress Level}
+| Stress Level | N | Mean | Std. Dev. | Min | Max |
+|--------------|---|------|-----------|-----|-----|
+| Low | 296 | 2.78 | 0.28 | 2.25 | 3.60 |
+| Moderate | 674 | 2.99 | 0.27 | 2.45 | 3.75 |
+| High | 1028 | 3.23 | 0.29 | 2.30 | 4.00 |
+| **Overall** | **1998** | **3.12** | **0.30** | **2.25** | **4.00** |
 
-\begin{figure}[H]
-\centering
-\begin{tikzpicture}
-\begin{axis}[
-    width=12cm,
-    height=8cm,
-    xlabel={Stress Level},
-    ylabel={GPA},
-    xmin=0.5, xmax=3.5,
-    ymin=2.2, ymax=4.1,
-    xtick={1,2,3},
-    xticklabels={\textbf{Low}, \textbf{Moderate}, \textbf{High}},
-    ytick={2.25, 2.50, 2.75, 3.00, 3.25, 3.50, 3.75, 4.00},
-    grid=major,
-    grid style={line width=.1pt, draw=gray!30},
-    axis background/.style={fill=white},
-    tick label style={font=\small},
-    label style={font=\large},
-    title={GPA Distribution by Stress Level},
-    title style={font=\Large\bfseries, yshift=0.3cm}
-]
+#### Testing ANOVA Assumptions
 
-% Low Stress Box Plot (x=1)
-\draw[lowstressbox, very thick] (axis cs:0.85,2.63) rectangle (axis cs:1.15,2.92);
-\draw[lowstressbox, very thick] (axis cs:0.85,2.78) -- (axis cs:1.15,2.78);
-\draw[lowstressbox, thick] (axis cs:1.00,2.63) -- (axis cs:1.00,2.25);
-\draw[lowstressbox, thick] (axis cs:1.00,2.92) -- (axis cs:1.00,3.35);
-\draw[lowstressbox, thick] (axis cs:0.95,2.25) -- (axis cs:1.05,2.25);
-\draw[lowstressbox, thick] (axis cs:0.95,3.35) -- (axis cs:1.05,3.35);
+**1. Normality Test (Shapiro-Wilk Test)**
 
-% Moderate Stress Box Plot (x=2)
-\draw[modstressbox, very thick] (axis cs:1.85,2.82) rectangle (axis cs:2.15,3.16);
-\draw[modstressbox, very thick] (axis cs:1.85,2.99) -- (axis cs:2.15,2.99);
-\draw[modstressbox, thick] (axis cs:2.00,2.82) -- (axis cs:2.00,2.45);
-\draw[modstressbox, thick] (axis cs:2.00,3.16) -- (axis cs:2.00,3.55);
-\draw[modstressbox, thick] (axis cs:1.95,2.45) -- (axis cs:2.05,2.45);
-\draw[modstressbox, thick] (axis cs:1.95,3.55) -- (axis cs:2.05,3.55);
+**Table 3: Normality Tests by Stress Level**
 
-% High Stress Box Plot (x=3)
-\draw[highstressbox, very thick] (axis cs:2.85,3.05) rectangle (axis cs:3.15,3.41);
-\draw[highstressbox, very thick] (axis cs:2.85,3.23) -- (axis cs:3.15,3.23);
-\draw[highstressbox, thick] (axis cs:3.00,3.05) -- (axis cs:3.00,2.55);
-\draw[highstressbox, thick] (axis cs:3.00,3.41) -- (axis cs:3.00,4.00);
-\draw[highstressbox, thick] (axis cs:2.95,2.55) -- (axis cs:3.05,2.55);
-\draw[highstressbox, thick] (axis cs:2.95,4.00) -- (axis cs:3.05,4.00);
+| Stress Level | W-statistic | p-value | Normal? |
+|--------------|-------------|---------|---------|
+| Low | 0.987 | 0.089 | Yes (p > 0.05) |
+| Moderate | 0.991 | 0.156 | Yes (p > 0.05) |
+| High | 0.985 | 0.0004 | No (p < 0.05) |
 
-\end{axis}
-\end{tikzpicture}
-\caption{Box plot showing GPA distribution across stress levels. There's a clear upward trend in median GPA as stress level increases.}
-\label{fig:gpa_boxplot_improved}
-\end{figure}
+**2. Homogeneity of Variances (Levene's Test)**
 
-\subsubsection{Testing ANOVA Assumptions}
+> **Levene's Test Results:**
+> - **Test Statistic:** F = 4.82
+> - **p-value:** p = 0.008
+> - **Conclusion:** Variances are **not equal** across groups (p < 0.05)
 
-\textbf{1. Normality Test (Shapiro-Wilk Test)}
-
-\begin{table}[H]
-\centering
-\caption{Normality Tests by Stress Level}
-\begin{tabular}{|l|c|c|c|}
-\hline
-\textbf{Stress Level} & \textbf{W-statistic} & \textbf{p-value} & \textbf{Normal?} \\
-\hline
-Low & 0.987 & 0.089 & Yes (p > 0.05) \\
-\hline
-Moderate & 0.991 & 0.156 & Yes (p > 0.05) \\
-\hline
-High & 0.985 & 0.0004 & No (p < 0.05) \\
-\hline
-\end{tabular}
-\label{tab:normality_test}
-\end{table}
-
-\textbf{2. Homogeneity of Variances (Levene's Test)}
-
-\begin{methodbox}
-\textbf{Levene's Test Results:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Test Statistic:} F = 4.82
-    \item \textbf{p-value:} p = 0.008
-    \item \textbf{Conclusion:} Variances are \textbf{not equal} across groups (p < 0.05)
-\end{itemize}
-\end{methodbox}
-
-\subsubsection{ANOVA Assumption Violations}
+#### ANOVA Assumption Violations
 
 Since our data violates both the normality assumption (for the High stress group) and the homogeneity of variances assumption, we have two options:
 
-\textbf{Dealing with Assumption Violations:}
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Welch's ANOVA:} Robust to unequal variances
-    \item \textbf{Kruskal-Wallis Test:} Non-parametric alternative when normality is violated
-\end{enumerate}
+**Dealing with Assumption Violations:**
+1. **Welch's ANOVA:** Robust to unequal variances
+2. **Kruskal-Wallis Test:** Non-parametric alternative when normality is violated
 
-We will proceed with \textbf{Welch's ANOVA} as it handles unequal variances and is reasonably robust to moderate violations of normality, especially with large sample sizes.
+We will proceed with **Welch's ANOVA** as it handles unequal variances and is reasonably robust to moderate violations of normality, especially with large sample sizes.
 
-\subsubsection{Hypothesis Testing}
+#### Hypothesis Testing
 
-\begin{methodbox}
-\textbf{Hypotheses:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Null Hypothesis ($H_0$):} $\mu_{\text{Low}} = \mu_{\text{Moderate}} = \mu_{\text{High}}$
-    
-    All stress level groups have equal mean GPA
-    
-    \item \textbf{Alternative Hypothesis ($H_1$):} At least one group mean is different
-    
-    \item \textbf{Significance Level:} $\alpha = 0.05$
-\end{itemize}
-\end{methodbox}
+> **Hypotheses:**
+> - **Null Hypothesis (H₀):** μ_Low = μ_Moderate = μ_High
+>   
+>   All stress level groups have equal mean GPA
+> 
+> - **Alternative Hypothesis (H₁):** At least one group mean is different
+> 
+> - **Significance Level:** α = 0.05
 
-\subsubsection{Welch's ANOVA Results}
+#### Welch's ANOVA Results
 
-\begin{table}[h]
-\centering
-\caption{Welch's One-Way ANOVA Results: GPA by Stress Level}
-\begin{tabular}{|l|c|c|c|c|c|}
-\hline
-\textbf{Source} & \textbf{Sum of Squares} & \textbf{df} & \textbf{Mean Square} & \textbf{F-statistic} & \textbf{p-value} \\
-\hline
-Between Groups & 84.23 & 2 & 42.115 & 467.65 & < 0.001 \\
-\hline
-Within Groups (adjusted) & 77.74 & 863.39 & 0.090 & - & - \\
-\hline
-\end{tabular}
-\label{tab:welch_anova}
-\end{table}
+**Table 4: Welch's One-Way ANOVA Results: GPA by Stress Level**
 
-\begin{methodbox}
-\textbf{Welch's ANOVA Test Results:}
+| Source | Sum of Squares | df | Mean Square | F-statistic | p-value |
+|--------|----------------|----|-----------|-----------| --------|
+| Between Groups | 84.23 | 2 | 42.115 | 467.65 | < 0.001 |
+| Within Groups (adjusted) | 77.74 | 863.39 | 0.090 | - | - |
 
-\begin{itemize}[leftmargin=*]
-    \item \textbf{F-statistic:} F(2, 863.39) = 467.65
-    \item \textbf{p-value:} p < 0.001 (highly significant)
-    \item \textbf{Degrees of Freedom:} Numerator df = 2, Denominator df = 863.39
-    \item \textbf{Decision:} \textcolor{red}{\textbf{Reject H$_0$}} at $\alpha = 0.05$
-    \item \textbf{Conclusion:} There are statistically significant differences in mean GPA across stress levels
-\end{itemize}
-\end{methodbox}
+> **Welch's ANOVA Test Results:**
+> 
+> - **F-statistic:** F(2, 863.39) = 467.65
+> - **p-value:** p < 0.001 (highly significant)
+> - **Degrees of Freedom:** Numerator df = 2, Denominator df = 863.39
+> - **Decision:** **Reject H₀** at α = 0.05
+> - **Conclusion:** There are statistically significant differences in mean GPA across stress levels
 
-\subsubsection{Post-Hoc Analysis: Games-Howell Test}
+#### Post-Hoc Analysis: Games-Howell Test
 
 Since we used Welch's ANOVA due to unequal variances, we use the Games-Howell post-hoc test (which doesn't assume equal variances) to determine which specific groups differ:
 
-\begin{table}[H]
-\caption{Post-Hoc Comparisons (Games-Howell Test)}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Comparison} & \textbf{Mean Difference} & \textbf{95\% CI} & \textbf{p-value} & \textbf{Significant?} \\
-\hline
-Moderate vs Low & 0.208 & [0.161, 0.255] & < 0.001 & Yes \\
-\hline
-High vs Low & 0.445 & [0.403, 0.487] & < 0.001 & Yes \\
-\hline
-High vs Moderate & 0.237 & [0.205, 0.269] & < 0.001 & Yes \\
-\hline
-\end{tabular}
-\label{tab:posthoc_improved}
-\end{table}
+**Table 5: Post-Hoc Comparisons (Games-Howell Test)**
 
-\subsubsection{Interpretation of Results}
+| Comparison | Mean Difference | 95% CI | p-value | Significant? |
+|------------|----------------|--------|---------|--------------|
+| Moderate vs Low | 0.208 | [0.161, 0.255] | < 0.001 | Yes |
+| High vs Low | 0.445 | [0.403, 0.487] | < 0.001 | Yes |
+| High vs Moderate | 0.237 | [0.205, 0.269] | < 0.001 | Yes |
 
-\textbf{Key Findings:}
+#### Interpretation of Results
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Statistically Significant Relationship:} There is strong evidence (p < 0.001) that GPA differs significantly across stress levels.
-    
-    \item \textbf{Direction of Relationship:} \textcolor{blue}{\textbf{Positive correlation}} - Higher stress is associated with higher GPA:
-    \begin{itemize}
-        \item Low Stress: Mean GPA = 2.78
-        \item Moderate Stress: Mean GPA = 2.99
-        \item High Stress: Mean GPA = 3.23
-    \end{itemize}
-    
-    \item \textbf{All Pairwise Differences Significant:} Every comparison shows significant differences, indicating a clear stepwise pattern.
-\end{enumerate}
+**Key Findings:**
 
-\subsection{Research Question 3: Linear Regression Analysis - Study Hours vs GPA}
+1. **Statistically Significant Relationship:** There is strong evidence (p < 0.001) that GPA differs significantly across stress levels.
 
-\textbf{Question:} What is the relationship between daily study hours and student GPA? Can we quantify how much GPA increases for each additional hour of study?
+2. **Direction of Relationship:** **Positive correlation** - Higher stress is associated with higher GPA:
+   - Low Stress: Mean GPA = 2.78
+   - Moderate Stress: Mean GPA = 2.99
+   - High Stress: Mean GPA = 3.23
 
-\subsubsection{Assumptions for Linear Regression}
+3. **All Pairwise Differences Significant:** Every comparison shows significant differences, indicating a clear stepwise pattern.
+
+### Research Question 3: Linear Regression Analysis - Study Hours vs GPA
+
+**Question:** What is the relationship between daily study hours and student GPA? Can we quantify how much GPA increases for each additional hour of study?
+
+#### Assumptions for Linear Regression
 
 Before conducting the regression analysis, we must verify that our data satisfies the following assumptions:
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Linearity:} The relationship between study hours and GPA should be linear
-    \item \textbf{Independence:} Each student's data should be independent of others
-    \item \textbf{Homoscedasticity:} The variance of residuals should be constant across all levels of the predictor
-    \item \textbf{Normality of residuals:} The residuals should be approximately normally distributed
-\end{enumerate}
+1. **Linearity:** The relationship between study hours and GPA should be linear
+2. **Independence:** Each student's data should be independent of others
+3. **Homoscedasticity:** The variance of residuals should be constant across all levels of the predictor
+4. **Normality of residuals:** The residuals should be approximately normally distributed
 
-\subsubsection{Initial Correlation Analysis}
+#### Initial Correlation Analysis
 
 Before conducting the formal regression analysis, we examine the correlation between study hours and GPA:
 
-\textbf{Correlation Coefficient:} $r = 0.7344$
+**Correlation Coefficient:** r = 0.7344
 
-This indicates a \textbf{strong positive correlation} between study hours and GPA, suggesting that students who study more hours per day tend to achieve higher GPAs.
+This indicates a **strong positive correlation** between study hours and GPA, suggesting that students who study more hours per day tend to achieve higher GPAs.
 
-\subsubsection{Model Specification}
+#### Model Specification
 
 The linear regression model is specified as:
-\begin{equation}
-\text{GPA}_i = \beta_0 + \beta_1 \times \text{Study Hours}_i + \epsilon_i
-\end{equation}
+
+```
+GPA_i = β₀ + β₁ × Study Hours_i + ε_i
+```
 
 where:
-\begin{itemize}[leftmargin=*]
-    \item $\text{GPA}_i$ is the \textbf{response variable} (Grade Point Average for student $i$)
-    \item $\text{Study Hours}_i$ is the \textbf{explanatory variable} (daily study hours for student $i$)
-    \item $\beta_0$ is the intercept parameter
-    \item $\beta_1$ is the slope parameter (effect of study hours on GPA)
-    \item $\epsilon_i$ is the error term for student $i$
-\end{itemize}
+- GPA_i is the **response variable** (Grade Point Average for student i)
+- Study Hours_i is the **explanatory variable** (daily study hours for student i)
+- β₀ is the intercept parameter
+- β₁ is the slope parameter (effect of study hours on GPA)
+- ε_i is the error term for student i
 
-\subsubsection{Fitted Regression Model}
+#### Fitted Regression Model
 
-\begin{methodbox}
-\textbf{Fitted Regression Equation:}
-\begin{equation}
-\widehat{\text{GPA}} = 1.9642 + 0.1541 \times \text{Study Hours}
-\end{equation}
+> **Fitted Regression Equation:**
+> 
+> ```
+> GPA = 1.9642 + 0.1541 × Study Hours
+> ```
+> 
+> **Interpretation:**
+> - **Intercept (β₀ = 1.9642):** The predicted GPA when study hours = 0 is approximately 1.96
+> - **Slope (β₁ = 0.1541):** For each additional hour of daily study, GPA increases by approximately 0.154 points
+> - **R-squared = 0.539:** The model explains 53.9% of the variance in GPA
 
-\textbf{Interpretation:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Intercept ($\beta_0 = 1.9642$):} The predicted GPA when study hours = 0 is approximately 1.96
-    \item \textbf{Slope ($\beta_1 = 0.1541$):} For each additional hour of daily study, GPA increases by approximately 0.154 points
-    \item \textbf{R-squared = 0.539:} The model explains 53.9\% of the variance in GPA
-\end{itemize}
-\end{methodbox}
+#### Assumption Testing
 
-\subsubsection{Assumption Testing}
+**Homoscedasticity Assessment:** The Breusch-Pagan test was conducted to check for constant variance of residuals. With a p-value of 0.9180, we reject the null hypothesis of homoscedasticity, indicating that heteroscedasticity is present in our model. This violation affects the reliability of standard errors.
 
-\textbf{Homoscedasticity Assessment:} The Breusch-Pagan test was conducted to check for constant variance of residuals. With a p-value of 0.9180, we reject the null hypothesis of homoscedasticity, indicating that heteroscedasticity is present in our model. This violation affects the reliability of standard errors.
+**Normality of Residuals:** The Shapiro-Wilk test for normality of residuals yielded a p-value of 0.4635. Since this is greater than 0.05, we fail to reject the null hypothesis, indicating that the residuals appear to be normally distributed.
 
-\textbf{Normality of Residuals:} The Shapiro-Wilk test for normality of residuals yielded a p-value of 0.4635. Since this is greater than 0.05, we fail to reject the null hypothesis, indicating that the residuals appear to be normally distributed.
-
-\subsubsection{Bootstrap Analysis for Robust Inference}
+#### Bootstrap Analysis for Robust Inference
 
 Due to the violation of the heteroskedasticity assumption, we employ bootstrap methods to obtain robust confidence intervals.
 
-\begin{importantbox}
-\textbf{Bootstrap Procedure:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Number of Bootstrap Samples:} 5000
-    \item \textbf{Sampling Method:} Random sampling with replacement
-    \item \textbf{Parameters Estimated:} Intercept and slope coefficients
-\end{itemize}
-\end{importantbox}
+> **Bootstrap Procedure:**
+> - **Number of Bootstrap Samples:** 5000
+> - **Sampling Method:** Random sampling with replacement
+> - **Parameters Estimated:** Intercept and slope coefficients
 
-\begin{table}[H]
-\centering
-\caption{Bootstrap Confidence Intervals (95\%)}
-\begin{tabular}{|l|c|c|c|c|}
-\hline
-\textbf{Parameter} & \textbf{OLS Estimate} & \textbf{Bootstrap SE} & \textbf{95\% CI Lower} & \textbf{95\% CI Upper} \\
-\hline
-Intercept & 1.9642 & 0.02456 & 1.9164 & 2.0126 \\
-\hline
-Slope & 0.1541 & 0.00322 & 0.1477 & 0.1603 \\
-\hline
-\end{tabular}
-\label{tab:bootstrap_results}
-\end{table}
+**Table 6: Bootstrap Confidence Intervals (95%)**
 
-\begin{conclusionbox}
-\textbf{Bootstrap Significance Testing:}
-\begin{itemize}[leftmargin=*]
-    \item \textbf{Intercept Significance:} True (95\% CI does not contain 0)
-    \item \textbf{Slope Significance:} True (95\% CI does not contain 0)
-\end{itemize}
+| Parameter | OLS Estimate | Bootstrap SE | 95% CI Lower | 95% CI Upper |
+|-----------|--------------|--------------|--------------|--------------|
+| Intercept | 1.9642 | 0.02456 | 1.9164 | 2.0126 |
+| Slope | 0.1541 | 0.00322 | 0.1477 | 0.1603 |
 
-\textbf{Robust Conclusion:} We are 95\% confident that the true population slope lies between [0.1477, 0.1603], confirming the significant positive relationship between study hours and GPA.
-\end{conclusionbox}
+> **Bootstrap Significance Testing:**
+> - **Intercept Significance:** True (95% CI does not contain 0)
+> - **Slope Significance:** True (95% CI does not contain 0)
+> 
+> **Robust Conclusion:** We are 95% confident that the true population slope lies between [0.1477, 0.1603], confirming the significant positive relationship between study hours and GPA.
 
-\subsection{Research Question 4: Study Time vs Social Interaction Analysis}
+### Research Question 4: Study Time vs Social Interaction Analysis
 
-\textbf{Question:} Is the average daily social interaction time significantly different between students who study more than the median number of hours per day (7.4) and those who study less or equal?
+**Question:** Is the average daily social interaction time significantly different between students who study more than the median number of hours per day (7.4) and those who study less or equal?
 
-\textbf{Approach:} We aim to compare the average daily social interaction time between two groups of students — those who study more than the median and those who study less — using appropriate statistical tests based on assumptions.
+**Approach:** We aim to compare the average daily social interaction time between two groups of students — those who study more than the median and those who study less — using appropriate statistical tests based on assumptions.
 
-\subsubsection{Assumptions for Two-Sample Hypothesis Testing}
+#### Assumptions for Two-Sample Hypothesis Testing
 
 Before deciding which statistical test to use, we check the following assumptions:
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Independence:} Observations in each group are assumed to be independent.
-    \item \textbf{Scale of Measurement:} The dependent variable, social interaction time, is measured on a continuous scale.
-    \item \textbf{Normality:} Each group's social interaction times should be approximately normally distributed.
-    \item \textbf{Homogeneity of Variances:} The variances between the two groups should be equal.
-\end{enumerate}
+1. **Independence:** Observations in each group are assumed to be independent.
+2. **Scale of Measurement:** The dependent variable, social interaction time, is measured on a continuous scale.
+3. **Normality:** Each group's social interaction times should be approximately normally distributed.
+4. **Homogeneity of Variances:** The variances between the two groups should be equal.
 
-\subsubsection{Assumption Testing}
+#### Assumption Testing
 
-\textbf{Normality Assessment:} The Shapiro-Wilk test was applied to both groups. The resulting p-values were less than $2.2 \times 10^{-16}$ for both groups, indicating strong evidence against normality.
+**Normality Assessment:** The Shapiro-Wilk test was applied to both groups. The resulting p-values were less than 2.2 × 10⁻¹⁶ for both groups, indicating strong evidence against normality.
 
-\textbf{Homogeneity of Variances:} Levene's Test was used to evaluate variance equality. The variance for the High Study group was $s_1^2 = 2.694$ and for the Low Study group it was $s_2^2 = 2.908$. The computed F-ratio was $F = \frac{2.694}{2.908} \approx 0.926$, and the p-value was 0.02189, indicating a statistically significant difference in variances.
+**Homogeneity of Variances:** Levene's Test was used to evaluate variance equality. The variance for the High Study group was s₁² = 2.694 and for the Low Study group it was s₂² = 2.908. The computed F-ratio was F = 2.694/2.908 ≈ 0.926, and the p-value was 0.02189, indicating a statistically significant difference in variances.
 
-\begin{importantbox}
-\textbf{Conclusion on Assumptions:} Since the normality assumption is violated but the sample sizes are large ($n > 30$), we rely on the Central Limit Theorem. Given that the variances are unequal, we proceed with Welch's t-test.
-\end{importantbox}
+> **Conclusion on Assumptions:** Since the normality assumption is violated but the sample sizes are large (n > 30), we rely on the Central Limit Theorem. Given that the variances are unequal, we proceed with Welch's t-test.
 
-\subsubsection{Welch's t-Test Analysis}
+#### Welch's t-Test Analysis
 
-\textbf{Formula for Test Statistic:}
-\begin{equation} \label{eq:welch}
-t = \frac{\bar{X}_1 - \bar{X}_2}{\sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}}
-\end{equation}
+**Formula for Test Statistic:**
+
+```
+t = (X̄₁ - X̄₂) / √(s₁²/n₁ + s₂²/n₂)
+```
 
 where:
-\begin{itemize}[leftmargin=*]
-  \item $\bar{X}_1 = 2.48$, $s_1^2 = 2.694$, $n_1 = 983$ (High Study Group's Social Interaction Time Info)
-  \item $\bar{X}_2 = 2.92$, $s_2^2 = 2.908$, $n_2 = 1017$ (Low Study Group's Social Interaction Time Info)
-\end{itemize}
+- X̄₁ = 2.48, s₁² = 2.694, n₁ = 983 (High Study Group's Social Interaction Time Info)
+- X̄₂ = 2.92, s₂² = 2.908, n₂ = 1017 (Low Study Group's Social Interaction Time Info)
 
-\begin{methodbox}
-\textbf{Calculations:}
+> **Calculations:**
+> 
+> **Standard Error:**
+> SE = √(2.694/983 + 2.908/1017) ≈ 0.0740
+> 
+> **Test Statistic:**
+> t = (2.48 - 2.92)/0.0740 = -5.9365
+> 
+> **Degrees of Freedom:**
+> df = [(s₁²/n₁ + s₂²/n₂)²] / [((s₁²/n₁)²/(n₁-1)) + ((s₂²/n₂)²/(n₂-1))] ≈ 1998
 
-\textbf{Standard Error:}
-\[
-SE = \sqrt{\frac{2.694}{983} + \frac{2.908}{1017}} \approx 0.0740
-\]
+#### Test Summary and Results
 
-\textbf{Test Statistic:}
-\[
-t = \frac{2.48 - 2.92}{0.0740} = -5.9365
-\]
+**Table 7: Welch's t-Test Results Summary**
 
-\textbf{Degrees of Freedom:}
-\[
-df = \frac{\left(\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}\right)^2}{\frac{\left(\frac{s_1^2}{n_1}\right)^2}{n_1 - 1} + \frac{\left(\frac{s_2^2}{n_2}\right)^2}{n_2 - 1}} \approx 1998
-\]
-\end{methodbox}
+| Statistic | Value |
+|-----------|--------|
+| t-statistic | -5.9365 |
+| Degrees of Freedom | ≈ 1998 |
+| p-value | 1.712 × 10⁻⁹ |
+| 95% CI | (-0.5822, -0.2778) |
+| High Study Group Average Social Time | 2.48 hours (2h 29min) |
+| Low Study Group Average Social Time | 2.92 hours (2h 55min) |
 
-\subsubsection{Test Summary and Results}
+> **Statistical Interpretation:** The extremely small p-value (1.712 × 10⁻⁹) provides strong evidence to reject the null hypothesis at α = 0.05.
+> 
+> **Practical Conclusion:** Students who study more than the median number of hours tend to spend significantly less time socializing (2 hours 29 minutes vs 2 hours 55 minutes) compared to their peers who study less. The difference of approximately 26 minutes is both statistically significant and practically meaningful.
 
-\begin{table}[H]
-\centering
-\caption{Welch's t-Test Results Summary}
-\begin{tabular}{|l|c|}
-\hline
-\textbf{Statistic} & \textbf{Value} \\
-\hline
-$t$-statistic & -5.9365 \\
-\hline
-Degrees of Freedom & $\approx 1998$ \\
-\hline
-$p$-value & $1.712 \times 10^{-9}$ \\
-\hline
-95\% CI & $(-0.5822, -0.2778)$ \\
-\hline
-High Study Group Average Social Time & 2.48 hours (2h 29min) \\
-\hline
-Low Study Group Average Social Time & 2.92 hours (2h 55min) \\
-\hline
-\end{tabular}
-\label{tab:welch_ttest}
-\end{table}
+## Results and Conclusions
 
-\begin{conclusionbox}
-\textbf{Statistical Interpretation:} The extremely small p-value ($1.712 \times 10^{-9}$) provides strong evidence to reject the null hypothesis at $\alpha = 0.05$. 
-
-\textbf{Practical Conclusion:} Students who study more than the median number of hours tend to spend significantly less time socializing (2 hours 29 minutes vs 2 hours 55 minutes) compared to their peers who study less. The difference of approximately 26 minutes is both statistically significant and practically meaningful.
-\end{conclusionbox}
-
-\section{Results and Conclusions}
-
-\subsection{Summary of Key Findings}
+### Summary of Key Findings
 
 Our comprehensive statistical analysis of 2,000 university students has revealed several important insights about the relationship between lifestyle factors and academic performance:
 
+**Major Findings:**
 
-\textbf{Major Findings:}
+1. **Sleep Duration Analysis:** Students on average get 7.5 hours of sleep per day, which exceeds the recommended minimum of 7 hours (99% CI: [7.41, 7.59])
 
-\begin{enumerate}[leftmargin=*]
-    \item \textbf{Sleep Duration Analysis:} Students on average get 7.5 hours of sleep per day, which exceeds the recommended minimum of 7 hours (99\% CI: [7.41, 7.59])
-    
-    \item \textbf{Stress and GPA Relationship:} There is a significant positive relationship between stress levels and GPA:
-    \begin{itemize}
-        \item Low Stress: Mean GPA = 2.78
-        \item Moderate Stress: Mean GPA = 2.99  
-        \item High Stress: Mean GPA = 3.23
-    \end{itemize}
-    
-    \item \textbf{Study Hours Impact:} Each additional hour of daily study increases GPA by approximately 0.154 points, with the model explaining 53.9\% of GPA variance
-    
-    \item \textbf{Study-Social Trade-off:} Students who study more than the median hours socialize significantly less (2h 29min vs 2h 55min daily), suggesting a time allocation trade-off
-    
-    \item \textbf{Student Stress Distribution:} 51.4\% of students report high stress levels, indicating significant mental health concerns in the student population
-\end{enumerate}
+2. **Stress and GPA Relationship:** There is a significant positive relationship between stress levels and GPA:
+   - Low Stress: Mean GPA = 2.78
+   - Moderate Stress: Mean GPA = 2.99
+   - High Stress: Mean GPA = 3.23
 
-\subsection{Implications for Students and Educators}
+3. **Study Hours Impact:** Each additional hour of daily study increases GPA by approximately 0.154 points, with the model explaining 53.9% of GPA variance
 
-\textbf{For Students:}
-\begin{itemize}[leftmargin=*]
-    \item Increasing study time has a measurable positive impact on academic performance
-    \item Higher stress levels, while concerning for well-being, are associated with better academic outcomes in this sample
-    \item Most students achieve adequate sleep duration, supporting healthy learning
-    \item There appears to be a trade-off between study time and social interaction time
-\end{itemize}
+4. **Study-Social Trade-off:** Students who study more than the median hours socialize significantly less (2h 29min vs 2h 55min daily), suggesting a time allocation trade-off
 
-\textbf{For Educators and Administrators:}
-\begin{itemize}[leftmargin=*]
-    \item The high prevalence of student stress (51.4\% reporting high stress) warrants attention to mental health support services
-    \item Study time recommendations can be quantified: approximately 2 additional hours per day may increase GPA by ~0.3 points
-    \item The complex relationship between stress and performance suggests need for balanced approaches to academic rigor
-    \item The study-social time trade-off highlights the importance of helping students balance academic and social needs
-\end{itemize}
+5. **Student Stress Distribution:** 51.4% of students report high stress levels, indicating significant mental health concerns in the student population
 
-\subsection{Final Conclusions}
+### Implications for Students and Educators
+
+**For Students:**
+- Increasing study time has a measurable positive impact on academic performance
+- Higher stress levels, while concerning for well-being, are associated with better academic outcomes in this sample
+- Most students achieve adequate sleep duration, supporting healthy learning
+- There appears to be a trade-off between study time and social interaction time
+
+**For Educators and Administrators:**
+- The high prevalence of student stress (51.4% reporting high stress) warrants attention to mental health support services
+- Study time recommendations can be quantified: approximately 2 additional hours per day may increase GPA by ~0.3 points
+- The complex relationship between stress and performance suggests need for balanced approaches to academic rigor
+- The study-social time trade-off highlights the importance of helping students balance academic and social needs
+
+### Final Conclusions
 
 This study provides valuable quantitative insights into factors affecting student academic performance and lifestyle choices. The strong positive relationship between study hours and GPA offers practical guidance for students, while the unexpected positive correlation between stress and academic performance raises important questions about student well-being and academic pressure.
 
 The findings reveal a complex ecosystem of time allocation where increased study time correlates with higher academic performance but also with reduced social interaction time. This suggests that while academic intensity may drive higher performance, educational institutions should remain vigilant about student mental health and social well-being, striving to support academic excellence without compromising overall student development.
 
-\section{References}
+## References
 
-\begin{itemize}[leftmargin=*]
-    \item Steve R. (2024). Student lifestyle and academic performance dataset. Kaggle.,\\\href{https://www.kaggle.com/datasets/steve1215rogg/student-lifestyle-dataset/data}{https://www.kaggle.com/datasets/steve1215rogg/student-lifestyle-dataset/data}
-    \item Statistical Methods: R Statistical Software, Python Statistical Software
-    
-\end{itemize}
-
-\end{document}
+- Steve R. (2024). Student lifestyle and academic performance dataset. Kaggle. [https://www.kaggle.com/datasets/steve1215rogg/student-lifestyle-dataset/data](https://www.kaggle.com/datasets/steve1215rogg/student-lifestyle-dataset/data)
+- Statistical Methods: R Statistical Software, Python Statistical Software
